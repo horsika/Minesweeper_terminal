@@ -20,6 +20,22 @@ public class Main {
 
     }
 
+    public static void runGame(){
+        chooseRandomBlankField();
+        tb.revealFieldsRecursive(initialColChoice,initialRowChoice);
+        tb.printBoard();
+        System.out.println("Welcome!");
+
+        processUserInput();
+
+    }
+
+    private static int[] processUserInput() {
+        String userInput = sc.nextLine();
+        String[] coordinates = userInput.split(",");
+        return  new int[]{Integer.parseInt(coordinates[0]), Integer.parseInt(coordinates[1])};
+    }
+
     public static void chooseRandomBlankField(){
         int colChoice = bb.getR().nextInt(bb.getColumns()+1);
         int rowChoice = bb.getR().nextInt(bb.getRows()+1);
