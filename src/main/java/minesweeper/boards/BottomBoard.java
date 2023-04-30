@@ -1,6 +1,4 @@
 package minesweeper.boards;
-
-import minesweeper.ANSI;
 import minesweeper.fields.Field;
 
 import java.util.*;
@@ -19,21 +17,9 @@ public class BottomBoard {
         initBoard();
     }
 
-    public void printBoard() {
-        for (int i = 0; i <= columns; i++) {
-            for (int j = 0; j <= rows; j++) {
-                if(returnField(i, j).getValue() == 9){
-                    System.out.print(ANSI.RED_BG + " " + returnField(i, j).getValue() + " " + ANSI.RESET);
-                } else {
-                    System.out.print(" " + returnField(i, j).getValue() + " ");
-                }
-            }
-            System.out.println();
-        }
-    }
     public Field returnField(int i, int j) {
         for (Field field : fields) {
-            if(field.getColumnPosition() == i && field.getRowPosition() == j){
+            if (field.getColumnPosition() == i && field.getRowPosition() == j) {
                 return field;
             }
         }
@@ -52,7 +38,11 @@ public class BottomBoard {
         return r;
     }
 
-    public void initBoard() {
+    public List<Field> getFields() {
+        return fields;
+    }
+
+    private void initBoard() {
         for (int i = 0; i <= columns; i++) {
             for (int j = 0; j <= rows; j++) {
                 fields.add(new Field(0, i, j));
@@ -63,13 +53,13 @@ public class BottomBoard {
     }
 
     // PLACE MINES ----------------------------------------------------------------------------------------------------
-    public void placeMines() {
+    private void placeMines() {
         int mineCounter = 0;
 
-            while (mineCounter < decideNumberofMines()) {
-                int columnPosition = r.nextInt(columns+1);
-                int rowPosition = r.nextInt(rows+1);
-                   while (!isAlreadyABomb(columnPosition, rowPosition)) {
+        while (mineCounter < decideNumberofMines()) {
+            int columnPosition = r.nextInt(columns + 1);
+            int rowPosition = r.nextInt(rows + 1);
+            while (!isAlreadyABomb(columnPosition, rowPosition)) {
 
                 for (Field field : fields) {
                     if (field.getColumnPosition() == columnPosition && field.getRowPosition() == rowPosition) {
@@ -79,7 +69,7 @@ public class BottomBoard {
                     }
                 }
             }
-            }
+        }
     }
 
     private int decideNumberofMines() {
@@ -99,42 +89,38 @@ public class BottomBoard {
 
     // PLACE NEIGHBORING FIELDS ---------------------------------------------------------------------------------------
 
-    public void placeNeighbors() {
+    private void placeNeighbors() {
         for (Field field : fields) {
-            int conditionCounter = 0;
-
+            int col = field.getColumnPosition();
+            int row = field.getRowPosition();
             if (field.getValue() != 9) {
-                conditionCounter = getFieldValue(field, conditionCounter);
+                int conditionCounter = minesNearBy(col, row);
                 field.setValue(field.getValue() + conditionCounter);
             }
         }
     }
 
-    private int getFieldValue(Field field, int conditionCounter) {
-        int col = field.getColumnPosition();
-        int row = field.getRowPosition();
-        try {
-            List<Field> neighbors = new ArrayList<>();
-                neighbors.add(returnField(col - 1, row - 1));
-                neighbors.add(returnField(col, row - 1));
-                neighbors.add(returnField(col + 1, row - 1));
-                neighbors.add(returnField(col - 1, row));
-                neighbors.add(returnField(col + 1, row));
-                neighbors.add(returnField(col - 1, row + 1));
-                neighbors.add(returnField(col, row + 1));
-                neighbors.add(returnField(col + 1, row + 1));
+    public int minesNearBy(int col, int row) {
 
-                neighbors.removeAll(Collections.singleton(null)); // null values must be removed
+        List<Field> neighbors = new ArrayList<>();
+        neighbors.add(returnField(col - 1, row - 1));
+        neighbors.add(returnField(col, row - 1));
+        neighbors.add(returnField(col + 1, row - 1));
+        neighbors.add(returnField(col - 1, row));
+        neighbors.add(returnField(col + 1, row));
+        neighbors.add(returnField(col - 1, row + 1));
+        neighbors.add(returnField(col, row + 1));
+        neighbors.add(returnField(col + 1, row + 1));
 
-            for (Field neighbor : neighbors) {
-                if (neighbor.getValue() == 9) {
-                    conditionCounter++;
-                }
+        neighbors.removeAll(Collections.singleton(null)); // null values must be removed
+
+        int mineCounter = 0;
+        for (Field neighbor : neighbors) {
+            if (neighbor.getValue() == 9) {
+                mineCounter++;
             }
-        } catch (NullPointerException ignored) {
-            //ignore
         }
-        return conditionCounter;
+        return mineCounter;
     }
 
 
